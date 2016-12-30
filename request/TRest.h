@@ -1,8 +1,10 @@
 #ifndef THEATRE_ADMIN_TDEBUG_H
 #define THEATRE_ADMIN_TDEBUG_H
-
 #include <QtWidgets/QtWidgets>
 #include "utils/TDB.h"
+#include "utils/TJson.h"
+
+class TJsonHighlighter;
 
 class TRest : public QWidget {
 	TDB db;
@@ -11,6 +13,7 @@ class TRest : public QWidget {
 	QPushButton *b_send;
 
 	QTextEdit *t_res;
+	TJsonHighlighter *t_hig;
 
 public:
 	TRest();

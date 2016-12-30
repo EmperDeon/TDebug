@@ -20,6 +20,7 @@ set(P_S
         utils/TDB.cpp
         utils/TDLogin.cpp
         utils/TDump.cpp
+        utils/TJson.cpp
         )
 
 set(P_H
@@ -31,11 +32,13 @@ set(P_H
         utils/TDB.h
         utils/TDLogin.h
         utils/TDump.h
+        utils/TJson.h
         )
 
 qt5_wrap_cpp(GENERATED_SOURCES ${P_H})
+qt5_add_resources(RES res/res.qrc)
 
-add_executable(Theatre_Debug ${P_S} ${P_H})
+add_executable(Theatre_Debug ${P_S} ${P_H} ${RES})
 qt5_use_modules(Theatre_Debug Core Widgets Network Concurrent)
 target_compile_features(Theatre_Debug PRIVATE cxx_range_for)
 target_link_libraries(Theatre_Debug ${Qt5Core_QTMAIN_LIBRARIES})

@@ -1,0 +1,94 @@
+QWidget {
+    background-color: #333;
+    color: white;
+}
+
+QGroupBox {
+    margin-top: 1ex; /* leave space at the top for the title */
+    border: 1px solid #444;
+    border-radius: 1px;
+}
+
+QGroupBox::title {
+    margin-top: -4ex;
+}
+
+QLineEdit {
+    padding-left: 5px;
+    border-radius: 1px;
+    border: 1px solid #444;
+    background-color: #222;
+}
+
+QLineEdit:focus {
+    border: 1px solid #444;
+}
+
+QPushButton {
+    border-radius: 1px;
+    border: 1px solid #444;
+    background-color: #222;
+}
+
+QPushButton:pressed {
+    border-radius: 1px;
+    border: 1px solid #666;
+    background-color: #333;
+}
+
+QPushButton:focus {
+    border: 1px solid #444;
+}
+
+QTextEdit {
+    border-radius: 1px;
+    border: 1px solid #444;
+    background-color: #222;
+    color: white;
+}
+
+QTextEdit:focus {
+    border: 1px solid #444;
+}
+
+QScrollBar:vertical {
+    border: 1px solid #555;
+    background: #222;
+    width: 15px;
+    margin: 22px 1px 22px 1px;
+}
+
+QScrollBar::handle:vertical {
+    background: #444;
+    min-height: 20px;
+}
+
+QScrollBar::add-line:vertical {
+    margin: 0 1px 1px 1px;
+    border: 1px solid #444;
+    background: #222;
+    height: 20px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+    margin: 1px 1px 0 1px;
+    border: 1px solid #444;
+    background: #222;
+    height: 20px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+    border: 1px solid #444;
+    width: 3px;
+    height: 3px;
+    background: #222;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
