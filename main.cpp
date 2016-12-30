@@ -1,10 +1,10 @@
 #include <QApplication>
-#include "TDebug.h"
+#include "TMainWindow.h"
 
 int main(int argc, char **argv) {
 	QApplication a(argc, argv);
 
-	TDebug *app = new TDebug();
+	TMainWindow *app = new TMainWindow();
 	app->show();
 
 	return a.exec();

@@ -1,6 +1,6 @@
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QLabel>
-#include <TConfig.h>
+#include <utils/TConfig.h>
 #include "TDLogin.h"
 
 TDLogin::TDLogin(QString mess, QWidget *parent) : QDialog(parent) {

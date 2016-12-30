@@ -1,5 +1,9 @@
 #include "TDump.h"
 
+TDump::TDump() {
+
+}
+
 QString TDump::dumpFile(QString fileName) {
 	QString r;
 
@@ -41,4 +45,4 @@ void TDump::dump() {
 
 
 	qDebug() << "Success";
-};
+}

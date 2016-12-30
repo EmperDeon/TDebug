@@ -12,24 +12,25 @@ find_package(Qt5Concurrent)
 
 set(P_S
         main.cpp
+        TMainWindow.cpp
 
-        TDebug.cpp
-        TConfig.cpp
-        TDB.cpp
+        request/TRest.cpp
 
-        TDLogin.cpp
-
-        TDump.cpp
+        utils/TConfig.cpp
+        utils/TDB.cpp
+        utils/TDLogin.cpp
+        utils/TDump.cpp
         )
 
 set(P_H
-        TDebug.h
-        TConfig.h
-        TDB.h
+        TMainWindow.h
 
-        TDLogin.h
+        request/TRest.h
 
-        TDump.cpp
+        utils/TConfig.h
+        utils/TDB.h
+        utils/TDLogin.h
+        utils/TDump.h
         )
 
 qt5_wrap_cpp(GENERATED_SOURCES ${P_H})

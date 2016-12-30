@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QLineEdit>
-#include <QTWidgets/QPushButton>
+#include <QtWidgets/QPushButton>
 
 class TDLogin : public QDialog {
 	QLineEdit *e_login, *e_password;

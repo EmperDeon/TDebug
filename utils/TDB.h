@@ -8,13 +8,10 @@
 
 class TDB {
 	QNetworkAccessManager manager;
+
 	QJsonObject lastReply;
 	QString token;
 	TConfig conf;
-
-	QStringList roles;
-
-	QJsonValue GET(QString path, QMap<QString, QString> params);
 
 	void getToken();
 
@@ -27,11 +24,7 @@ class TDB {
 public:
 	TDB();
 
-	QJsonValue request(QString path, QMap<QString, QString> params = QMap<QString, QString>());
-
-	QJsonObject lastError();
-
-	QStringList getPerms();
+	QString GET(QString path, QMap<QString, QString> params);
 };
 
 
