@@ -17,7 +17,7 @@ class TResponse : public QGroupBox {
 public:
 	TResponse();
 
-	void processResponse(TDB &db, QString response);
+	void processResponse(TDBResponse r);
 };
 
 

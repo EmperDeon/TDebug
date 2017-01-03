@@ -22,8 +22,8 @@ TResponse::TResponse() : QGroupBox(tr("Ответ")) {
 	l_time->setProperty("responseStats", true);
 	t_time->setProperty("responseStats", true);
 
-	t_code_s->setStyleSheet("background: #4caf50;  padding: 5px 10px;  border-radius: 4px;");
-	t_code_e->setStyleSheet("background: #af3733;  padding: 5px 10px;  border-radius: 4px;");
+	t_code_s->setStyleSheet("background: #4caf50");
+	t_code_e->setStyleSheet("background: #af3733");
 	t_code_s->setVisible(false);
 	t_code_e->setVisible(false);
 
@@ -41,23 +41,22 @@ TResponse::TResponse() : QGroupBox(tr("Ответ")) {
 	setLayout(l);
 }
 
-void TResponse::processResponse(TDB &db, QString response) {
-	QString code = db.getLastCode();
-	t_code_s->setText(code);
-	t_code_s->setVisible(code.startsWith("200"));
-	t_code_e->setText(code);
-	t_code_e->setVisible(!code.startsWith("200"));
+void TResponse::processResponse(TDBResponse r) {
+	t_code_s->setText(r.code);
+	t_code_s->setVisible(r.code.startsWith("200"));
+	t_code_e->setText(r.code);
+	t_code_e->setVisible(!r.code.startsWith("200"));
 
-	t_time->setText(db.getLastTime());
+	t_time->setText(r.time);
 
-	if (response.startsWith('{')) {
+	if (r.text.startsWith('{')) {
 		t_hig->setEnabled(true);
-		QJsonObject o = QJsonDocument::fromJson(response.toUtf8()).object();
+		QJsonObject o = QJsonDocument::fromJson(r.text.toUtf8()).object();
 		t_res->setText(TJson::printO(o, 0));
 
-	} else {
+	} else { // TODO: Write HTML pretty print
 		t_hig->setEnabled(false);
-		t_res->setText(response);
+		t_res->setText(r.text);
 
 	}
 }

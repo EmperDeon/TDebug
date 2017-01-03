@@ -15,6 +15,8 @@ public:
 	void reload();
 
 	QString getCurrent();
+
+	QString getFieldName() const;
 };
 
 

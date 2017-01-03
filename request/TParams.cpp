@@ -12,10 +12,18 @@ TParams::TParams() : QGroupBox(tr("Параметры")) {
 	connect(b_fill, &QPushButton::clicked, this, &TParams::fillFromUrl);
 
 	addLine({b_fill, p_token});
+
+	QJsonArray arr = TConfig().get("lastParams").toArray();
+	for (QJsonValue v : arr) {
+		QJsonObject o = v.toObject();
+		addLine({}, o["key"].toString(), o["val"].toString());
+	}
+
 	addLine();
 
 	setLayout(p_vl);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+	setVisible(false);
 }
 
 void TParams::fillFromUrl() {
@@ -28,11 +36,11 @@ void TParams::toggle() {
 	setVisible(v);
 }
 
-void TParams::addLine(QList<QWidget *> l) {
+void TParams::addLine(QList<QWidget *> l, QString key, QString val) {
 	QHBoxLayout *th;
 
 	if (l.count() == 0) {
-		th = getParamLine();
+		th = getParamLine(key, val);
 
 	} else {
 		th = new QHBoxLayout;
@@ -117,4 +125,12 @@ void TParams::checkLastLine() {
 		addLine();
 
 	}
+
+	QJsonArray arr;
+	for (int i = 0; i < l_keys.count(); i++) {
+		if (l_keys[i]->text() != "" || l_values[i]->text() != "")
+			arr << QJsonObject{{"key", l_keys[i]->text()},
+			                   {"val", l_values[i]->text()}};
+	}
+	TConfig().set("lastParams", arr);
 }

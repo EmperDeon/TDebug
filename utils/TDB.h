@@ -5,6 +5,10 @@
 #include <QJsonObject>
 #include "TConfig.h"
 
+struct TDBResponse {
+	QString text, code, time;
+};
+
 class TDB : public QObject {
 	QNetworkAccessManager manager;
 
@@ -23,6 +27,8 @@ class TDB : public QObject {
 
 public:
 	TDB();
+
+	TDBResponse request(QString path, QMap<QString, QString> params);
 
 	QString GET(QString path, QMap<QString, QString> params);
 

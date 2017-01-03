@@ -15,6 +15,9 @@ TRest::TRest() {
 	// 'Hide' button
 	connect(w_request, &TUrl::toggleParams, this, &TRest::paramsToggle);
 
+	bool params = TConfig().get("lastParamsActive", false).toBool();
+	if (params)
+		paramsToggle();
 
 	l->addWidget(w_request);
 	l->addWidget(w_params);
@@ -31,7 +34,7 @@ void TRest::sendRequest() {
 	auto url = w_request->getUrl();
 	auto par = w_params->getParams();
 
-	w_response->processResponse(db, db.GET(url, par));
+	w_response->processResponse(db.request(url, par));
 
 	w_request->unlock();
 }
@@ -42,6 +45,7 @@ void TRest::reloadLists() {
 
 void TRest::paramsToggle() {
 	w_params->toggle();
-
 	w_request->toggleHideButton(w_params->isVisible());
+
+	TConfig().set("lastParamsActive", w_params->isVisible());
 }

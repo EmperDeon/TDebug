@@ -31,6 +31,8 @@ public:
 	void unlock();
 
 	QString getUrl();
+
+	void saveUrl();
 };
 
 

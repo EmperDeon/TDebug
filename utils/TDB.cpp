@@ -13,6 +13,16 @@ TDB::TDB() {
 	token = TConfig().getS("token");
 }
 
+TDBResponse TDB::request(QString path, QMap<QString, QString> params) {
+	TDBResponse r;
+
+	r.text = GET(path, params);
+	r.code = getLastCode();
+	r.time = getLastTime();
+
+	return r;
+}
+
 
 QString TDB::GET(QString path, QMap<QString, QString> params) {
 	QTime requestTime;

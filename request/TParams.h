@@ -17,7 +17,7 @@ Q_SIGNALS:
 	void sendRequest();
 
 protected:
-	void addLine(QList<QWidget *> l = {});
+	void addLine(QList<QWidget *> l = {}, QString key = "", QString val = "");
 
 	void delLine();
 

@@ -4,7 +4,7 @@ TUrl::TUrl() : QGroupBox(tr("Запрос")) {
 	QHBoxLayout *l = new QHBoxLayout;
 
 	c_url = new TComboBox("servers");
-	l_url = new QLineEdit("updates/0");
+	l_url = new QLineEdit(TConfig().get("lastUrl").toString());
 
 	b_hide = new QPushButton;
 	b_send = new QPushButton(tr("Send"));
@@ -19,6 +19,7 @@ TUrl::TUrl() : QGroupBox(tr("Запрос")) {
 	l_url->setMinimumHeight(30);
 
 	connect(l_url, &QLineEdit::returnPressed, this, &TUrl::sendRequest);
+	connect(l_url, &QLineEdit::textChanged, this, &TUrl::saveUrl);
 	connect(b_hide, &QPushButton::clicked, this, &TUrl::toggleParams);
 	connect(b_send, &QPushButton::clicked, this, &TUrl::sendRequest);
 
@@ -58,5 +59,9 @@ bool TUrl::tryLock() {
 
 void TUrl::unlock() {
 	b_send->setText(tr("Отправить"));
+}
+
+void TUrl::saveUrl() {
+	TConfig().set("lastUrl", l_url->text());
 }
 
