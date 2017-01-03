@@ -1,10 +1,12 @@
 QWidget {
     background-color: #333;
     color: white;
+    /*border: 1px solid #000;*/
 }
 
 QGroupBox {
-    margin-top: 1ex; /* leave space at the top for the title */
+    font: normal 9pt "Fantasque Sans Mono";
+    margin-top: 1.5ex; /* leave space at the top for the title */
     border: 1px solid #444;
     border-radius: 1px;
 }
@@ -13,7 +15,17 @@ QGroupBox::title {
     margin-top: -4ex;
 }
 
+QLabel[responseStats=true] {
+    /*background: #4caf50;*/
+    font: normal 12pt "Fantasque Sans Mono";
+    font-weight: bold;
+    margin: 2px 0;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
 QLineEdit {
+    font: normal 10pt "Fantasque Sans Mono";
     padding-left: 5px;
     border-radius: 1px;
     border: 1px solid #444;
@@ -25,9 +37,12 @@ QLineEdit:focus {
 }
 
 QPushButton {
+    font: normal 10pt "Fantasque Sans Mono";
     border-radius: 1px;
     border: 1px solid #444;
     background-color: #222;
+    min-height: 25px;
+    padding: 0 5px;
 }
 
 QPushButton:pressed {
@@ -41,6 +56,7 @@ QPushButton:focus {
 }
 
 QTextEdit {
+    font: normal 10pt "Fantasque Sans Mono";
     border-radius: 1px;
     border: 1px solid #444;
     background-color: #222;
@@ -92,3 +108,36 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     background: none;
 }
 
+QComboBox {
+    font: normal 10pt "Fantasque Sans Mono";
+    border-radius: 1px;
+    border: 1px solid #444;
+    background-color: #222;
+    min-height: 25px;
+    padding: 0 5px;
+}
+
+QComboBox:focus {
+    border-radius: 1px;
+    border: 1px solid #666;
+    background-color: #333;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+
+    /* just a single line */
+    border-left: 1px solid #444;
+    border-top-right-radius: 3px; /* same radius as the QComboBox */
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow {
+    image: url(:/marker-inv.png);
+}
+
+QComboBox QAbstractItemView {
+    font-size: 14pt;
+}

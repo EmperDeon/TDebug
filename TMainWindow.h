@@ -14,7 +14,7 @@ public:
 
 	void constructMenu();
 
-	QAction *getNewAction(QString name, void (*func)()) const;
+	QAction *getNewAction(QString name, std::function<void()> func) const;
 };
 
 

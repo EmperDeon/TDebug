@@ -1,17 +1,17 @@
 #ifndef THEATRE_ADMIN_TDB_H
 #define THEATRE_ADMIN_TDB_H
-
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QJsonObject>
 #include "TConfig.h"
 
-class TDB {
+class TDB : public QObject {
 	QNetworkAccessManager manager;
 
 	QJsonObject lastReply;
+	int lastTime, lastCode;
+
 	QString token;
-	TConfig conf;
 
 	void getToken();
 
@@ -25,6 +25,10 @@ public:
 	TDB();
 
 	QString GET(QString path, QMap<QString, QString> params);
+
+	QString getLastTime();
+
+	QString getLastCode();
 };
 
 

@@ -15,5 +15,6 @@ int main(int argc, char **argv) {
 	TMainWindow *app = new TMainWindow();
 	app->show();
 
+
 	return a.exec();
 }

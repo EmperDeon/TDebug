@@ -1,6 +1,5 @@
 #include <QtCore/QFile>
 #include <QtCore/QJsonDocument>
-#include <QDebug>
 #include "TConfig.h"
 
 TConfig::TConfig() {

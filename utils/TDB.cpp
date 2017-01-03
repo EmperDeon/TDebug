@@ -5,31 +5,43 @@
 #include <QtCore/QJsonDocument>
 #include <QtNetwork/QNetworkReply>
 #include <QtWidgets/QMessageBox>
+#include <QtCore/QMetaEnum>
 #include "TDLogin.h"
 #include "TDB.h"
 
 TDB::TDB() {
-	token = conf.getS("token");
+	token = TConfig().getS("token");
 }
 
 
 QString TDB::GET(QString path, QMap<QString, QString> params) {
+	QTime requestTime;
+	requestTime.start();
+
+	if (path.endsWith('/')) {
+		path = path.remove(path.length() - 1, 1);
+	}
+
 	QUrl c(path);
 
 	QUrlQuery q;
 	for (QString k : params.keys())
-		q.addQueryItem(k, params[k]);
+		if (k != "" && params[k] != "")
+			q.addQueryItem(k, params[k]);
 
 	c.setQuery(q);
 
 	QNetworkReply *reply = manager.get(QNetworkRequest(c));
 	QEventLoop wait;
-	QObject::connect(&manager, SIGNAL(finished(QNetworkReply * )), &wait, SLOT(quit()));
-	QTimer::singleShot(10000, &wait, SLOT(quit()));
+	connect(&manager, SIGNAL(finished(QNetworkReply * )), &wait, SLOT(quit()));
+	QTimer::singleShot(30000, &wait, SLOT(quit()));
 	wait.exec();
 	QByteArray repl = reply->readAll();
 	lastReply = QJsonDocument::fromJson(repl).object();
 	reply->deleteLater();
+
+	lastCode = reply->error();
+	lastTime = requestTime.elapsed();
 
 	return QString::fromUtf8(repl);
 }
@@ -40,8 +52,8 @@ void TDB::getToken() {
 		exit(0); // TODO: prettify
 
 	} else {
-		conf.set("login", cred["login"]);
-		GET("auth/new", QMap<QString, QString>{
+		TConfig().set("login", cred["login"]);
+		GET("auth/new", {
 				{"login",    cred["login"].toString()},
 				{"password", cred["password"].toString()}
 		});
@@ -53,7 +65,7 @@ void TDB::getToken() {
 
 		} else {
 			token = o;
-			conf.set("token", token);
+			TConfig().set("token", token);
 
 		}
 	}
@@ -96,8 +108,35 @@ void TDB::refreshToken() {
 
 	if (!hasErrors()) {
 		token = o;
-		conf.set("token", token);
+		TConfig().set("token", token);
 	}
+}
+
+QString TDB::getLastTime() {
+	QString r = QString::number(lastTime);
+
+	if (r.size() > 3) {
+		r = r.insert(r.size() - 3, '\'');
+
+	}
+
+	return r + " ms";
+}
+
+QString TDB::getLastCode() {
+	QString r;
+
+	if (lastCode == 0) {
+		r = "200 OK";
+
+	} else {
+		QMetaObject obj = QNetworkReply::staticMetaObject;
+		QMetaEnum en = obj.enumerator(obj.indexOfEnumerator("NetworkError"));
+		r = QString::number(lastCode) + " - " + en.valueToKey(lastCode);
+
+	}
+
+	return r;
 }
 
 

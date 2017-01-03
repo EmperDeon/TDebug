@@ -4,73 +4,44 @@
 TRest::TRest() {
 	QVBoxLayout *l = new QVBoxLayout;
 
-	// Utils
-	QGroupBox *b1 = new QGroupBox("Request");
-	QHBoxLayout *l1 = new QHBoxLayout;
+	w_request = new TUrl;
+	w_params = new TParams;
+	w_response = new TResponse;
 
-	l_url = new QLineEdit("http://laravel.dev/api/updates/0");
+	// 'Enter' button
+	connect(w_request, &TUrl::sendRequest, this, &TRest::sendRequest);
+	connect(w_params, &TParams::sendRequest, this, &TRest::sendRequest);
 
-	b_send = new QPushButton("Send");
-	b_send->setFixedSize(75, 30);
-
-	l_url->setMinimumHeight(30);
-
-	connect(l_url, &QLineEdit::returnPressed, this, &TRest::sendRequest);
-	connect(b_send, &QPushButton::clicked, this, &TRest::sendRequest);
-
-	l1->addWidget(l_url);
-	l1->addWidget(b_send);
-
-	b1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	b1->setLayout(l1);
-	l->addWidget(b1);
-	// Utils
-
-	// Requests
-	QGroupBox *b2 = new QGroupBox("Response");
-	QVBoxLayout *l2 = new QVBoxLayout;
-
-	t_res = new QTextEdit;
-	t_res->setFont(QFont("Fantasque Sans Mono", 10));
-	t_hig = new TJsonHighlighter(t_res->document());
-	t_hig->setEnabled(false);
+	// 'Hide' button
+	connect(w_request, &TUrl::toggleParams, this, &TRest::paramsToggle);
 
 
-	l2->addWidget(t_res);
-
-	b2->setLayout(l2);
-	l->addWidget(b2);
-
+	l->addWidget(w_request);
+	l->addWidget(w_params);
+	l->addWidget(w_response);
 	l->setSpacing(10);
-	// Requests
 
 	setLayout(l);
-}//http://laravel-theatre.herokuapp.com/api/updates/0
+}
 
 void TRest::sendRequest() {
-	if (b_send->text() == "...")
+	if (!w_request->tryLock())
 		return;
 
-	b_send->setText("...");
+	auto url = w_request->getUrl();
+	auto par = w_params->getParams();
 
-	QString url = l_url->text();
-	QMap<QString, QString> par;
+	w_response->processResponse(db, db.GET(url, par));
 
-	processResponse(db.GET(url, par));
-
-	b_send->setText("Send");
+	w_request->unlock();
 }
 
-void TRest::processResponse(QString response) {
-	if (response.startsWith('{')) {
-		t_hig->setEnabled(true);
-		QJsonObject o = QJsonDocument::fromJson(response.toUtf8()).object();
-		t_res->setText(TJson::printO(o, 0));
-
-	} else {
-		t_hig->setEnabled(false);
-		t_res->setText(response);
-
-	}
+void TRest::reloadLists() {
+	w_request->reloadLists();
 }
 
+void TRest::paramsToggle() {
+	w_params->toggle();
+
+	w_request->toggleHideButton(w_params->isVisible());
+}

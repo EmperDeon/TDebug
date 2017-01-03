@@ -1,26 +1,34 @@
 #ifndef THEATRE_ADMIN_TDEBUG_H
 #define THEATRE_ADMIN_TDEBUG_H
 #include <QtWidgets/QtWidgets>
+#include <widgets/TComboBox.h>
 #include "utils/TDB.h"
 #include "utils/TJson.h"
+#include "request/TParams.h"
+#include "TUrl.h"
+#include "TResponse.h"
 
-class TJsonHighlighter;
+class TUrl;
+
+class TParams;
+
+class TResponse;
 
 class TRest : public QWidget {
 	TDB db;
 
-	QLineEdit *l_url;
-	QPushButton *b_send;
-
-	QTextEdit *t_res;
-	TJsonHighlighter *t_hig;
+	TUrl *w_request;
+	TParams *w_params;
+	TResponse *w_response;
 
 public:
 	TRest();
 
 	void sendRequest();
 
-	void processResponse(QString response);
+	void reloadLists();
+
+	void paramsToggle();
 };
 
 

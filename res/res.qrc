@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>style.qss</file>
+        <file>marker-inv.png</file>
+        <file>marker-inv-up.png</file>
     </qresource>
 </RCC>
