@@ -3,15 +3,14 @@
 #include <QtCore/QTimer>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QDebug>
+#include <QtCore/QTime>
 #include <QtNetwork/QNetworkReply>
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QMetaEnum>
-#include "TDLogin.h"
+#include <auth/TAuth.h>
+#include "auth/TDLogin.h"
 #include "TDB.h"
-
-TDB::TDB() {
-	token = TConfig().getS("token");
-}
 
 TDBResponse TDB::request(QString path, QMap<QString, QString> params) {
 	TDBResponse r;
@@ -32,57 +31,59 @@ QString TDB::GET(QString path, QMap<QString, QString> params) {
 		path = path.remove(path.length() - 1, 1);
 	}
 
+	QNetworkRequest req;
+	QNetworkReply *reply = nullptr;
+
+	QString method = params.take("method");
+	params.take("");
+
 	QUrl c(path);
-
 	QUrlQuery q;
-	for (QString k : params.keys())
-		if (k != "" && params[k] != "")
-			q.addQueryItem(k, params[k]);
 
-	c.setQuery(q);
+	for (QString k : params.keys()) {
+		if (k != "" && params[k] != "") {
+			QString par = params[k];
 
-	QNetworkReply *reply = manager.get(QNetworkRequest(c));
+			q.addQueryItem(k, par.startsWith("{{") ? getParameter(par) : par);
+		}
+	}
+
+	if (method == "get") {
+		c.setQuery(q);
+
+		req.setUrl(c);
+		reply = manager.get(req);
+
+	} else if (method == "post") {
+		req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+		req.setUrl(c);
+		reply = manager.post(req, q.toString(QUrl::FullyEncoded).toUtf8());
+
+	} else {
+		return "";
+	}
+
 	QEventLoop wait;
 	connect(&manager, SIGNAL(finished(QNetworkReply * )), &wait, SLOT(quit()));
-	QTimer::singleShot(30000, &wait, SLOT(quit()));
+	QTimer::singleShot(60000, &wait, SLOT(quit()));
 	wait.exec();
-	QByteArray repl = reply->readAll();
-	lastReply = QJsonDocument::fromJson(repl).object();
+	QByteArray rep = reply->readAll();
 	reply->deleteLater();
 
+	lastReply = QJsonDocument::fromJson(rep).object();
 	lastCode = reply->error();
 	lastTime = requestTime.elapsed();
 
-	return QString::fromUtf8(repl);
-}
+	qDebug() << QString("[ %1] '%2'  params: '%3'")
+			.arg(method.toUpper(), 4).arg(path.mid(path.indexOf('/', 8) + 1), 18).arg(params.keys().join(", "))
+			.toStdString().c_str();
 
-void TDB::getToken() {
-	QJsonObject cred = TDLogin::getCredentials();
-	if (cred.isEmpty()) {
-		exit(0); // TODO: prettify
-
-	} else {
-		TConfig().set("login", cred["login"]);
-		GET("auth/new", {
-				{"login",    cred["login"].toString()},
-				{"password", cred["password"].toString()}
-		});
-
-		QString o = lastReply["response"].toString();
-
-		if (hasErrors()) {
-			getToken();
-
-		} else {
-			token = o;
-			TConfig().set("token", token);
-
-		}
-	}
+	return QString::fromUtf8(rep);
 }
 
 void TDB::checkAndRefreshToken() {
-	GET("auth/check", {{"token", token}});
+	GET("auth_api/check", {{"token", TConfig().getS("token")}});
 
 	if (hasErrors()) {
 		checkAndRefreshToken();
@@ -95,31 +96,14 @@ bool TDB::hasErrors() {
 		QString err = lastReply["error"].toString(), mess;
 		qDebug() << "Error:" << err;
 
-		if (err == "token_expired") {
-			refreshToken();
-			return true;
-		}
-
 		if (err == "no_token" || err == "token_invalid") {
-			getToken();
-			return true;
+			TAuth::getToken();
 		}
 
 		return true;
 	}
 
 	return false;
-}
-
-void TDB::refreshToken() {
-	GET("auth/ref", {{"token", token}});
-	QString o = lastReply["response"].toString();
-
-
-	if (!hasErrors()) {
-		token = o;
-		TConfig().set("token", token);
-	}
 }
 
 QString TDB::getLastTime() {
@@ -134,19 +118,95 @@ QString TDB::getLastTime() {
 }
 
 QString TDB::getLastCode() {
-	QString r;
+	switch (lastCode) {
+		case QNetworkReply::NoError:
+			return "200 OK";
+		case QNetworkReply::AuthenticationRequiredError:
+			return "401 Auth required";
+		case QNetworkReply::ContentNotFoundError:
+			return "404 Not found";
+		case QNetworkReply::ContentOperationNotPermittedError:
+			return "403 || 405 Not permitted";
+		case QNetworkReply::UnknownContentError:
+			return "422 Validation error";
+		case QNetworkReply::InternalServerError:
+			return "500 Internal error";
 
-	if (lastCode == 0) {
-		r = "200 OK";
+		case QNetworkReply::ProxyAuthenticationRequiredError:
+			return "407 ProxyAuthenticationRequired";
+		case QNetworkReply::ContentConflictError:
+			return "409 ContentConflict";
+		case QNetworkReply::ContentGoneError:
+			return "410 ContentGone";
+		case QNetworkReply::ProtocolInvalidOperationError:
+			return "400 ProtocolInvalidOperation";
+		case QNetworkReply::OperationNotImplementedError:
+			return "501 OperationNotImplemented";
+		case QNetworkReply::ServiceUnavailableError:
+			return "503 ServiceUnavailable";
+		case QNetworkReply::UnknownServerError:
+			return "502 .. 511";
 
-	} else {
-		QMetaObject obj = QNetworkReply::staticMetaObject;
-		QMetaEnum en = obj.enumerator(obj.indexOfEnumerator("NetworkError"));
-		r = QString::number(lastCode) + " - " + en.valueToKey(lastCode);
+		case QNetworkReply::HostNotFoundError:
+			return "Error No host";
+		case QNetworkReply::ConnectionRefusedError:
+			return "Error ConnectionRefused";
+		case QNetworkReply::RemoteHostClosedError:
+			return "Error RemoteHostClosed";
+		case QNetworkReply::TimeoutError:
+			return "Error Timeout";
+		case QNetworkReply::OperationCanceledError:
+			return "Error OperationCanceled";
+		case QNetworkReply::SslHandshakeFailedError:
+			return "Error SslHandshakeFailed";
+		case QNetworkReply::TemporaryNetworkFailureError:
+			return "Error TemporaryNetworkFailure";
+		case QNetworkReply::NetworkSessionFailedError:
+			return "Error NetworkSessionFailed";
+		case QNetworkReply::BackgroundRequestNotAllowedError:
+			return "Error BackgroundRequestNotAllowed";
+		case QNetworkReply::TooManyRedirectsError:
+			return "Error TooManyRedirects";
+		case QNetworkReply::InsecureRedirectError:
+			return "Error InsecureRedirect";
+		case QNetworkReply::UnknownNetworkError:
+			return "Error UnknownNetwork";
+		case QNetworkReply::ProxyConnectionRefusedError:
+			return "Error ProxyConnectionRefused";
+		case QNetworkReply::ProxyConnectionClosedError:
+			return "Error ProxyConnectionClosed";
+		case QNetworkReply::ProxyNotFoundError:
+			return "Error ProxyNotFound";
+		case QNetworkReply::ProxyTimeoutError:
+			return "Error ProxyTimeout";
+		case QNetworkReply::UnknownProxyError:
+			return "Error UnknownProxy";
+		case QNetworkReply::ContentAccessDenied:
+			return "Error ContentAccessDenied";
+		case QNetworkReply::ContentReSendError:
+			return "Error ContentReSend";
+		case QNetworkReply::ProtocolUnknownError:
+			return "Error ProtocolUnknown";
+		case QNetworkReply::ProtocolFailure:
+			return "Error ProtocolFailure";
 
+		default:
+			return "Something else";
+	}
+}
+
+QString TDB::getParameter(QString par) {
+	par = par.mid(2, par.length() - 4);
+
+	QJsonArray a = TConfig().get("vars").toArray();
+	for (QJsonValue v : a) {
+		QJsonObject o = v.toObject();
+
+		if (o["name"].toString() == par)
+			return o["str"].toString();
 	}
 
-	return r;
+	return "";
 }
 
 

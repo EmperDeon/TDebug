@@ -49,10 +49,13 @@ void TResponse::processResponse(TDBResponse r) {
 
 	t_time->setText(r.time);
 
-	if (r.text.startsWith('{')) {
+	if (r.text.startsWith('{') || r.text.startsWith('[')) {
 		t_hig->setEnabled(true);
-		QJsonObject o = QJsonDocument::fromJson(r.text.toUtf8()).object();
-		t_res->setText(TJson::printO(o, 0));
+		QJsonDocument o = QJsonDocument::fromJson(r.text.toUtf8());
+		if (o.isObject())
+			t_res->setText(TJson::printO(o.object(), 0));
+		else if (o.isArray())
+			t_res->setText(TJson::printA(o.array(), 0));
 
 	} else { // TODO: Write HTML pretty print
 		t_hig->setEnabled(false);

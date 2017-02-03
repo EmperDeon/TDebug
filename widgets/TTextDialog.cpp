@@ -1,7 +1,7 @@
+#include "TTextDialog.h"
 #include <utils/TConfig.h>
-#include "TComboDialog.h"
 
-TComboDialog::TComboDialog(QString n) : name(n) {
+TTextDialog::TTextDialog(QString n) : name(n) {
 	QVBoxLayout *l = new QVBoxLayout;
 
 
@@ -15,8 +15,8 @@ TComboDialog::TComboDialog(QString n) : name(n) {
 	QPushButton *b_rem = new QPushButton("Удалить");
 	list = new QListWidget;
 
-	connect(b_add, &QPushButton::clicked, this, &TComboDialog::add);
-	connect(b_rem, &QPushButton::clicked, this, &TComboDialog::rem);
+	connect(b_add, &QPushButton::clicked, this, &TTextDialog::add);
+	connect(b_rem, &QPushButton::clicked, this, &TTextDialog::rem);
 
 	hl->addWidget(b_add);
 	hl->addWidget(b_rem);
@@ -41,7 +41,7 @@ TComboDialog::TComboDialog(QString n) : name(n) {
 
 	QPushButton *b_save = new QPushButton(tr("Сохранить"));
 
-	connect(b_save, &QPushButton::clicked, this, &TComboDialog::save);
+	connect(b_save, &QPushButton::clicked, this, &TTextDialog::save);
 
 	l->addWidget(gr);
 	l->addWidget(b_save);
@@ -49,7 +49,7 @@ TComboDialog::TComboDialog(QString n) : name(n) {
 	setLayout(l);
 }
 
-void TComboDialog::save() {
+void TTextDialog::save() {
 	QJsonArray a;
 
 	for (QString k : map.keys()) {
@@ -62,21 +62,22 @@ void TComboDialog::save() {
 	this->accept();
 }
 
-void TComboDialog::editList(QString n) {
-	TComboDialog *d = new TComboDialog(n);
+void TTextDialog::editList(QString n) {
+	TTextDialog *d = new TTextDialog(n);
 	d->exec();
 }
 
-void TComboDialog::add() { // TODO: Create own dialog with 2 fields or add them to layout
-	auto p = TInputDialog::getParams();
+void TTextDialog::add() { // TODO: Create own dialog with 2 fields or add them to layout
+	QString first = QInputDialog::getText(this, tr("Создание нового поля"), tr("Введите ключ"));
+	QString second = QInputDialog::getMultiLineText(this, tr("Создание нового поля"), tr("Введите значение"));
 
-	if (p.first != "" && p.second != "") {
-		list->addItem(p.first);
-		map.insert(p.first, p.second);
+	if (first != "" && second != "") {
+		list->addItem(first);
+		map.insert(first, second);
 	}
 }
 
-void TComboDialog::rem() {
+void TTextDialog::rem() {
 	auto selected = list->selectedItems();
 	if (selected.size() == 0)
 		return;
@@ -90,33 +91,4 @@ void TComboDialog::rem() {
 
 		map.remove(curr);
 	}
-}
-
-TInputDialog::TInputDialog() {
-	QFormLayout *l = new QFormLayout;
-	QHBoxLayout *hl = new QHBoxLayout;
-
-	l_par1 = new QLineEdit;
-	l_par2 = new QLineEdit;
-	QPushButton *b_acc = new QPushButton(tr("ОК")), *b_rej = new QPushButton(tr("Отмена"));
-
-	l->addRow(tr("Ключ:"), l_par1);
-	l->addRow(tr("Значение:"), l_par2);
-
-	hl->addWidget(b_acc);
-	hl->addWidget(b_rej);
-
-	l->addRow(hl);
-
-	connect(b_acc, &QPushButton::clicked, this, &TInputDialog::accept);
-	connect(b_rej, &QPushButton::clicked, this, &TInputDialog::reject);
-
-	setLayout(l);
-}
-
-QPair<QString, QString> TInputDialog::getParams() {
-	auto t = new TInputDialog;
-	t->exec();
-
-	return {t->l_par1->text(), t->l_par2->text()};
 }

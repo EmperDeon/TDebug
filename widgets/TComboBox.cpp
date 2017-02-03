@@ -4,6 +4,7 @@ TComboBox::TComboBox(QString n) : name(n) {
 	reload();
 
 	connect(this, &QComboBox::currentTextChanged, [=](QString s) {
+		Q_UNUSED(s)
 		TConfig().set(getFieldName(), this->currentIndex());
 	});
 }

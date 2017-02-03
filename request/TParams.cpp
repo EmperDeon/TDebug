@@ -4,30 +4,28 @@
 TParams::TParams() : QGroupBox(tr("Параметры")) {
 	p_vl = new QVBoxLayout;
 
-	QPushButton *b_fill = new QPushButton(tr("Заполнить из адреса"));
+	p_method = new TComboBox("methods");
 	p_token = new QCheckBox(tr("Токен"));
 
 	p_token->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	addLine({p_method, p_token});
 
-	connect(b_fill, &QPushButton::clicked, this, &TParams::fillFromUrl);
 
-	addLine({b_fill, p_token});
+	fillFromJSON(TConfig().get("lastParams").toArray());
 
-	QJsonArray arr = TConfig().get("lastParams").toArray();
-	for (QJsonValue v : arr) {
-		QJsonObject o = v.toObject();
-		addLine({}, o["key"].toString(), o["val"].toString());
-	}
-
-	addLine();
 
 	setLayout(p_vl);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 	setVisible(false);
 }
 
-void TParams::fillFromUrl() {
+void TParams::fillFromJSON(QJsonArray arr) {
+	for (QJsonValue v : arr) {
+		QJsonObject o = v.toObject();
+		addLine({}, o["key"].toString(), o["val"].toString());
+	}
 
+	addLine();
 }
 
 void TParams::toggle() {
@@ -92,6 +90,8 @@ QMap<QString, QString> TParams::getParams() {
 
 	if (p_token->isChecked())
 		r["token"] = TConfig().get("token").toString();
+
+	r["method"] = p_method->getCurrent();
 
 	for (int i = 0; i < l_keys.size(); i++) {
 		r.insert(l_keys[i]->text(), l_values[i]->text());

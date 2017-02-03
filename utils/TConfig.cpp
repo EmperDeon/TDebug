@@ -48,3 +48,9 @@ QString TConfig::getS(QString key, QString def) const {
 	return obj.contains(key) ? obj.value(key).toString(def) : def;
 }
 
+void TConfig::rem(QString key) {
+	obj.remove(key);
+
+	save();
+}
+

@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QtWidgets>
 
+class TInputDialog;
+
 class TComboDialog : public QDialog {
 	QString name;
 	QListWidget *list;
@@ -19,6 +21,16 @@ public:
 	void save();
 
 	static void editList(QString n);
+};
+
+
+class TInputDialog : QDialog {
+	QLineEdit *l_par1, *l_par2;
+
+public:
+	TInputDialog();
+
+	static QPair<QString, QString> getParams();
 };
 
 

@@ -1,5 +1,7 @@
 #include <utils/TDump.h>
 #include <widgets/TComboDialog.h>
+#include <widgets/TTextDialog.h>
+#include <auth/TAuth.h>
 #include "TMainWindow.h"
 
 TMainWindow::TMainWindow() {
@@ -22,6 +24,14 @@ void TMainWindow::constructMenu() {
 		TComboDialog::editList("servers");
 		wgt->reloadLists();
 	}));
+	l->addAction(getNewAction("Edit 'Variables'", [=]() {
+		TTextDialog::editList("vars");
+		wgt->reloadLists();
+	}));
+
+	QMenu *a = menu->addMenu("Auth");
+	a->addAction(getNewAction("Clear", []() { TAuth::clearToken(); }));
+	a->addAction(getNewAction("Get new", []() { TAuth::getToken(); }));
 }
 
 QAction *TMainWindow::getNewAction(QString name, std::function<void()> func) const {

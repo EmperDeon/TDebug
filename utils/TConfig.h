@@ -24,6 +24,8 @@ public:
 	bool has(QString key) const;
 
 	void set(QString key, QJsonValue val);
+
+	void rem(QString key);
 };
 
 

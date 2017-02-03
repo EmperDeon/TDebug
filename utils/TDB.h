@@ -15,18 +15,12 @@ class TDB : public QObject {
 	QJsonObject lastReply;
 	int lastTime, lastCode;
 
-	QString token;
-
-	void getToken();
-
-	void refreshToken();
-
 	void checkAndRefreshToken();
 
 	bool hasErrors();
 
 public:
-	TDB();
+	TDB() {}
 
 	TDBResponse request(QString path, QMap<QString, QString> params);
 
@@ -35,6 +29,10 @@ public:
 	QString getLastTime();
 
 	QString getLastCode();
+
+	QString getParameter(QString par);
+
+	friend class TAuth;
 };
 
 
