@@ -5,27 +5,20 @@
 #include <QtCore/QJsonObject>
 
 class TConfig {
-	QJsonObject obj;
-	const QString fileName = "config.json";
-
 public:
-	TConfig();
+	static QJsonObject load();
 
-	void reload();
+	static void save(QJsonObject obj);
 
-	void save();
+	static QJsonValue get(QString key, QJsonValue def = QJsonValue());
 
-	~TConfig();
+	static QString getS(QString key, QString def = "");
 
-	QJsonValue get(QString key, QJsonValue def = QJsonValue()) const;
+	static bool has(QString key);
 
-	QString getS(QString key, QString def = "") const;
+	static void set(QString key, QJsonValue val);
 
-	bool has(QString key) const;
-
-	void set(QString key, QJsonValue val);
-
-	void rem(QString key);
+	static void rem(QString key);
 };
 
 

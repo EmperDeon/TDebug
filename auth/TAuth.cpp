@@ -17,7 +17,7 @@ void TAuth::getToken() {
 		exit(0); // TODO: prettify
 
 	} else {
-		TConfig().set("login", cred["login"]);
+		TConfig::set("login", cred["login"]);
 		TDB db;
 
 		db.GET(getUrl() + "auth_api/new", {
@@ -33,21 +33,21 @@ void TAuth::getToken() {
 			getToken();
 
 		} else {
-			TConfig().set("token", o);
+			TConfig::set("token", o);
 
 		}
 	}
 }
 
 void TAuth::clearToken() {
-	TConfig().rem("token");
+	TConfig::rem("token");
 }
 
 QString TAuth::getUrl() {
-	QJsonArray a = TConfig().get("servers").toArray();
-	QString s = a[TConfig().get("lastServers").toInt()].toObject()["str"].toString();
+	QJsonArray a = TConfig::get("servers").toArray();
+	QString s = a[TConfig::get("lastServers").toInt()].toObject()["str"].toString();
 
-	QString url = s + TConfig().get("lastUrl").toString();
+	QString url = s + TConfig::get("lastUrl").toString();
 	url = url.mid(0, url.indexOf('/', 8));
 
 	return url + '/';

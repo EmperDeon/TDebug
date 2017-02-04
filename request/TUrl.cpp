@@ -4,7 +4,7 @@ TUrl::TUrl() : QGroupBox(tr("Запрос")) {
 	QHBoxLayout *l = new QHBoxLayout;
 
 	c_url = new TComboBox("servers");
-	l_url = new QLineEdit(TConfig().get("lastUrl").toString());
+	l_url = new QLineEdit(TConfig::get("lastUrl").toString());
 
 	b_hide = new QPushButton;
 	b_send = new QPushButton(tr("Send"));
@@ -62,6 +62,6 @@ void TUrl::unlock() {
 }
 
 void TUrl::saveUrl() {
-	TConfig().set("lastUrl", l_url->text());
+	TConfig::set("lastUrl", l_url->text());
 }
 

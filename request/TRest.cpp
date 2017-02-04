@@ -15,7 +15,7 @@ TRest::TRest() {
 	// 'Hide' button
 	connect(w_request, &TUrl::toggleParams, this, &TRest::paramsToggle);
 
-	bool params = TConfig().get("lastParamsActive", false).toBool();
+	bool params = TConfig::get("lastParamsActive", false).toBool();
 	if (params)
 		paramsToggle();
 
@@ -47,5 +47,5 @@ void TRest::paramsToggle() {
 	w_params->toggle();
 	w_request->toggleHideButton(w_params->isVisible());
 
-	TConfig().set("lastParamsActive", w_params->isVisible());
+	TConfig::set("lastParamsActive", w_params->isVisible());
 }

@@ -27,7 +27,7 @@ TTextDialog::TTextDialog(QString n) : name(n) {
 	gr->setLayout(gl);
 
 	if (n != "") {
-		QJsonArray a = TConfig().get(n).toArray();
+		QJsonArray a = TConfig::get(n).toArray();
 
 		for (QJsonValue v : a) {
 			QJsonObject o = v.toObject();
@@ -57,7 +57,7 @@ void TTextDialog::save() {
 		                 {"str",  map[k]}};
 	}
 
-	TConfig().set(name, a);
+	TConfig::set(name, a);
 
 	this->accept();
 }

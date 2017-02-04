@@ -5,13 +5,13 @@ TComboBox::TComboBox(QString n) : name(n) {
 
 	connect(this, &QComboBox::currentTextChanged, [=](QString s) {
 		Q_UNUSED(s)
-		TConfig().set(getFieldName(), this->currentIndex());
+		TConfig::set(getFieldName(), this->currentIndex());
 	});
 }
 
 void TComboBox::reload() {
 	if (name != "") {
-		QJsonArray a = TConfig().get(name).toArray();
+		QJsonArray a = TConfig::get(name).toArray();
 
 		for (QJsonValue v : a) {
 			QJsonObject o = v.toObject();
@@ -19,7 +19,7 @@ void TComboBox::reload() {
 			this->addItem(o["name"].toString(), o["str"].toString());
 		}
 
-		int active = TConfig().get(getFieldName()).toInt();
+		int active = TConfig::get(getFieldName()).toInt();
 		this->setCurrentIndex(active);
 	}
 }

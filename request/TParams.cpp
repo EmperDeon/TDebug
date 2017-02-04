@@ -11,7 +11,7 @@ TParams::TParams() : QGroupBox(tr("Параметры")) {
 	addLine({p_method, p_token});
 
 
-	fillFromJSON(TConfig().get("lastParams").toArray());
+	fillFromJSON(TConfig::get("lastParams").toArray());
 
 
 	setLayout(p_vl);
@@ -89,7 +89,7 @@ QMap<QString, QString> TParams::getParams() {
 	QMap<QString, QString> r;
 
 	if (p_token->isChecked())
-		r["token"] = TConfig().get("token").toString();
+		r["token"] = TConfig::get("token").toString();
 
 	r["method"] = p_method->getCurrent();
 
@@ -132,5 +132,5 @@ void TParams::checkLastLine() {
 			arr << QJsonObject{{"key", l_keys[i]->text()},
 			                   {"val", l_values[i]->text()}};
 	}
-	TConfig().set("lastParams", arr);
+	TConfig::set("lastParams", arr);
 }

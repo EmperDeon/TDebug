@@ -7,7 +7,6 @@
 #include <QtCore/QTime>
 #include <QtNetwork/QNetworkReply>
 #include <QtWidgets/QMessageBox>
-#include <QtCore/QMetaEnum>
 #include <auth/TAuth.h>
 #include "auth/TDLogin.h"
 #include "TDB.h"
@@ -83,7 +82,7 @@ QString TDB::GET(QString path, QMap<QString, QString> params) {
 }
 
 void TDB::checkAndRefreshToken() {
-	GET("auth_api/check", {{"token", TConfig().getS("token")}});
+	GET("auth_api/check", {{"token", TConfig::getS("token")}});
 
 	if (hasErrors()) {
 		checkAndRefreshToken();
@@ -198,7 +197,7 @@ QString TDB::getLastCode() {
 QString TDB::getParameter(QString par) {
 	par = par.mid(2, par.length() - 4);
 
-	QJsonArray a = TConfig().get("vars").toArray();
+	QJsonArray a = TConfig::get("vars").toArray();
 	for (QJsonValue v : a) {
 		QJsonObject o = v.toObject();
 

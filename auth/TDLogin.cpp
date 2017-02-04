@@ -9,7 +9,7 @@ TDLogin::TDLogin(QString mess, QWidget *parent) : QDialog(parent) {
 
 	l_mess->setAlignment(Qt::AlignCenter);
 
-	e_login = new QLineEdit(TConfig().getS("login"));
+	e_login = new QLineEdit(TConfig::getS("login"));
 	e_login->setAlignment(Qt::AlignCenter);
 	e_login->setPlaceholderText(tr("Логин"));
 	e_login->setTextMargins(5, 5, 5, 5);
